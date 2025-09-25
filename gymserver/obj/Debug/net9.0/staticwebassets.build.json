@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "T9jHb7o6bc05Xpti5eGCXA8ssXkSrZj0dwdg1BvtNi8=",
+  "Source": "gymserver",
+  "BasePath": "_content/gymserver",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
