@@ -1,10 +1,12 @@
 namespace gymapi.UnitTests.Systems.Controllers;
 
+using System.Net;
 using gymapi.Controllers;
 using gymapi.Data;
 using gymapi.Models;
 using gymapi.src.AuthManagement;
 using gymapi.UnitTests.Fixtures;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -39,11 +41,11 @@ public class AuthControllerTest
 
         Assert.NotNull(result);
         var createdAtActionResultObject = Assert.IsType<CreatedAtActionResult>(result);
-        Assert.Equal(201, createdAtActionResultObject.StatusCode);
+        Assert.Equal(StatusCodes.Status201Created, createdAtActionResultObject.StatusCode);
 
     }
     [Fact]
-    public async Task POST_CreateUser_OnSuccess_ReturnsStatusCode200_ForReturningUser()
+    public async Task POST_CreateUser_ReturnsStatusCode400_IfUserExists()
     {
         var loggerMock = new Mock<ILogger<AuthController>>();
 
@@ -61,8 +63,8 @@ public class AuthControllerTest
         var result = await authController.PostCreateUser(postBodyRequest);
 
         Assert.NotNull(result);
-        var okObjectResult = Assert.IsType<OkObjectResult>(result);
-        Assert.Equal(200, okObjectResult.StatusCode);
+        var badRequestObject = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestObject.StatusCode);
 
     }
 
@@ -78,7 +80,7 @@ public class AuthControllerTest
 
         Assert.NotNull(result);
         var badRequestObject = Assert.IsType<BadRequestResult>(result);
-        Assert.Equal(400, badRequestObject.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestObject.StatusCode);
 
     }
 
@@ -94,7 +96,7 @@ public class AuthControllerTest
 
         Assert.NotNull(result);
         var badRequestObject = Assert.IsType<BadRequestResult>(result);
-        Assert.Equal(400, badRequestObject.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestObject.StatusCode);
 
     }
 }

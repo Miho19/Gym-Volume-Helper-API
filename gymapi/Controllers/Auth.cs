@@ -30,11 +30,9 @@ public class AuthController : ControllerBase
             if (String.IsNullOrEmpty(bodyRequest.AuthID)) return BadRequest();
 
             var user = await _userRepository.GetUser(bodyRequest.AuthID);
-            if (user is not null) return Ok(user);
+            if (user is not null) return BadRequest("User already exists");
 
             var createdUser = await CreateUser(bodyRequest.AuthID);
-
-
             return CreatedAtAction(nameof(PostCreateUser), new { id = createdUser.Id }, createdUser);
 
         }
