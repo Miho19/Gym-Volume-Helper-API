@@ -150,9 +150,6 @@ public class UserRepositoryTest
         var result = await userRepositoryMock.UpdateUser(updateUser);
 
 
-        // usersDbsetMock.Verify(x => x.Remove(It.IsAny<User>()), Times.Once);
-        // gymServerContextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-
         Assert.NotNull(result);
         Assert.IsType<User>(result);
         Assert.Equal(users[0].Id, result.Id);
