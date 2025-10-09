@@ -1,0 +1,10 @@
+@gymserver_HostAddress = http://localhost:5064
+
+POST {{gymserver_HostAddress}}/auth/
+Content-Type: application/json
+
+{
+    "authID": "ewr"
+}
+
+###
