@@ -1,10 +1,14 @@
-using gymapi.Controllers;
+using System.Security.Claims;
+using dotenv.net;
 using gymapi.Data;
 using gymapi.Data.Repository.User;
-using gymapi.src.AuthManagement;
-using gymapi.src.AuthManagement.Auth0;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotEnv.Load();
+
 
 // Add services to the container.
 
@@ -15,11 +19,21 @@ builder.Services.AddOpenApi();
 // dependency injection stuff
 builder.Services.AddDbContext<GymServerContext>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
-// builder.Services.AddScoped<IUserService, UserService>();
-// builder.Services.Configure<UsersApiOptions>(builder.Configuration.GetSection("UsersApiOptions"));
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<IAuthManagement, Auth0Management>();
 
+
+System.Environment.GetEnvironmentVariable("");
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.Authority = $"{System.Environment.GetEnvironmentVariable("Auth0URL")}";
+    options.Audience = $"{System.Environment.GetEnvironmentVariable("Auth0ManagementAPIIdentifier")}";
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+    {
+        NameClaimType = ClaimTypes.NameIdentifier
+    };
+});
 
 var app = builder.Build();
 
@@ -30,7 +44,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
