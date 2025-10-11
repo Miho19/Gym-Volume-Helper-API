@@ -1,6 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using gymapi.Models;
-using gymapi.src.AuthManagement.Auth0;
-
+using Microsoft.AspNetCore.Http;
 namespace gymapi.UnitTests.Fixtures;
 
 public static class UserFixture
@@ -26,12 +27,25 @@ public static class UserFixture
         };
     }
 
-    public static Auth0ManagementSystemFetchUserResponse TestAuth0UserResponse()
+    public static HttpContext TestValidUserHttpContext()
     {
-        return new Auth0ManagementSystemFetchUserResponse()
+        var claims = new List<Claim>()
         {
-            UserID = "123456",
-            Image = "https://fakeImageUrl.com"
+            new Claim(ClaimTypes.NameIdentifier, "TestUserName"),
+            new Claim(JwtRegisteredClaimNames.Sub, "TestuserSub"),
         };
+
+        var identity = new ClaimsIdentity(claims, "TestAuthType");
+
+        var principal = new ClaimsPrincipal(identity);
+
+        return new DefaultHttpContext() { User = principal };
     }
+
+    public static HttpContext TestInvalidUserHttpContext()
+    {
+        return new DefaultHttpContext();
+    }
+
+
 }
