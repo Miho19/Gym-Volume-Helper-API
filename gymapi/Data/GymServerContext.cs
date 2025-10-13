@@ -11,6 +11,6 @@ public class GymServerContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         DotEnv.Load();
-        optionsBuilder.UseMySql(Environment.GetEnvironmentVariable("DatabaseConnectionString"), new MySqlServerVersion(new Version(8, 0, 43)));
+        optionsBuilder.UseMySql(Environment.GetEnvironmentVariable("DatabaseConnectionString"), new MySqlServerVersion(new Version(8, 0, 43))).EnableDetailedErrors();
     }
 }

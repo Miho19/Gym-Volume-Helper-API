@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 DotEnv.Load();
 
 
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -20,10 +21,6 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<GymServerContext>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddHttpClient();
-
-
-System.Environment.GetEnvironmentVariable("");
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

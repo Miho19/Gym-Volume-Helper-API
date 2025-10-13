@@ -1,4 +1,6 @@
 
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +20,14 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("GetMe")]
-    public Task<IActionResult> GetMe()
+    public async Task<IActionResult> GetMe()
     {
+        var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
+        if (string.IsNullOrEmpty(userSub))
+            return NotFound("User does not exist");
+
+
+        return Ok($"{userSub}");
     }
 }
