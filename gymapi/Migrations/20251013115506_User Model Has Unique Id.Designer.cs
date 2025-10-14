@@ -12,7 +12,7 @@ namespace gymapi.Migrations
 {
     [DbContext(typeof(GymServerContext))]
     [Migration("20251013115506_user model has unique id")]
-    partial class usermodelhasuniqueid
+    partial class UserModelHasUniqueId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
