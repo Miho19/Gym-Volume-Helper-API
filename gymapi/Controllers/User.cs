@@ -28,6 +28,7 @@ public class UserController : ControllerBase
             return NotFound("User does not exist");
 
 
+
         return Ok($"{userSub}");
     }
 }
