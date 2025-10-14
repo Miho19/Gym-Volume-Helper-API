@@ -1,4 +1,6 @@
 
+namespace gymapi.UnitTests.Systems.Controllers;
+
 using gymapi.Controllers;
 using gymapi.UnitTests.Fixtures;
 using Microsoft.AspNetCore.Http;
