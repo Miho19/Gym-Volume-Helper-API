@@ -143,6 +143,20 @@ public class UserControllerTest
 
     }
 
+    [Fact]
+    public async Task UpdateMe_OnSuccess_Returns200StatusCodeWithUpdatedUser()
+    {
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
+        var requestBody = UserFixture.TestUser();
+        _userRepositoryMock.Setup(x => x.UpdateUser(It.IsAny<User>())).ReturnsAsync(requestBody);
 
+        var result = await _userControllerMock.UpdateMe(requestBody);
+
+        Assert.NotNull(result);
+        var okResultObject = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(StatusCodes.Status200OK, okResultObject.StatusCode);
+
+
+    }
 
 }

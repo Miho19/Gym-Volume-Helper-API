@@ -10,14 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace gymapi.Controllers;
 
 /** 
-    Get, Post
-
+    Post -> Create new user
     /user
 
-    Get, Patch/Put/Delete?
+    Get -> current user, PUT PATCH DELETE
     /user/me
-    /user/{id:int}
-
 
 */
 
@@ -35,6 +32,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("GetMe")]
+    [Route("/me")]
     public async Task<IActionResult> GetMe()
     {
         var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
@@ -63,7 +61,20 @@ public class UserController : ControllerBase
         await _userRepository.AddUser(requestBody);
 
         return new CreatedAtActionResult("Created user", nameof(CreateMe), new { Id = requestBody.Id }, requestBody);
+    }
 
+    [HttpPut]
+    public async Task<IActionResult> UpdateMe([FromBody] User requestBody)
+    {
+        var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        if (string.IsNullOrEmpty(userSub))
+            return new UnauthorizedObjectResult("JWT missing Sub claim");
+
+        var result = await _userRepository.UpdateUser(requestBody);
+        if (result is null)
+            return new NotFoundObjectResult("User not found");
+
+        return new OkObjectResult(result);
     }
 
 }
