@@ -4,6 +4,7 @@ namespace gymapi.UnitTests.Systems.Controllers;
 using gymapi.Controllers;
 using gymapi.Data;
 using gymapi.Data.Repository.User;
+using gymapi.Models;
 using gymapi.UnitTests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,18 +30,37 @@ public class UserControllerTest
     }
 
     [Fact]
-    public async Task GetMe_OnSuccess_Returns200StatusCode()
+    public async Task GetMe_JWTHasSubWithValidUser_Returns200StatusCode()
     {
+        _userRepositoryMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(UserFixture.TestUser());
         _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
-
         var result = await _userControllerMock.GetMe();
+
         Assert.NotNull(result);
         var okResultObject = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(StatusCodes.Status200OK, okResultObject.StatusCode);
     }
+
+
+
     [Fact]
-    public async Task GetMe_OnFailure_Returns404StatusCode()
+    public async Task GetMe_JWTHasSubWithInvalidUser_Returns302RedirectStatusCode()
     {
+        _userRepositoryMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync((User?)null);
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
+        var result = await _userControllerMock.GetMe();
+
+        Assert.NotNull(result);
+
+        var redirectResult = Assert.IsType<RedirectResult>(result);
+        Assert.Equal("/createnewuser", redirectResult.Url);
+    }
+
+
+    [Fact]
+    public async Task GetMe_JWTMissingSubWithValidUser_Return404Failure()
+    {
+        _userRepositoryMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(UserFixture.TestUser());
         _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestInvalidUserHttpContext() };
 
         var result = await _userControllerMock.GetMe();

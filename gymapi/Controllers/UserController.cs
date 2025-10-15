@@ -28,12 +28,12 @@ public class UserController : ControllerBase
         var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
         if (string.IsNullOrEmpty(userSub))
-            return NotFound("User does not exist");
+            return new NotFoundObjectResult("User does not exist");
 
         var user = await _userRepository.GetUser(userSub);
         if (user is not null)
-            return Ok(user);
+            return new OkObjectResult(user);
 
-        return StatusCode(500, "An unexpected server error occurred");
+        return new RedirectResult("/createnewuser");
     }
 }
