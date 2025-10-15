@@ -127,5 +127,22 @@ public class UserControllerTest
         Assert.Equal(StatusCodes.Status400BadRequest, badRequestObjectResult.StatusCode);
     }
 
+    [Fact]
+    public async Task CreateMe_OnSuccess_WithValidSubAndRequestUserBody_CallsCorrectMethods()
+    {
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
+        var requestBody = UserFixture.TestUser();
+        var result = await _userControllerMock.CreateMe(requestBody);
+
+        Assert.NotNull(result);
+        Assert.IsType<CreatedAtActionResult>(result);
+
+
+        _userRepositoryMock.Verify(x => x.GetUser(It.IsAny<string>()), Times.Exactly(1));
+        _userRepositoryMock.Verify(x => x.AddUser(It.IsAny<User>()), Times.Exactly(1));
+
+    }
+
+
 
 }
