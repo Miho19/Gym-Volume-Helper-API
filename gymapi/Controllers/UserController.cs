@@ -1,6 +1,7 @@
 
 using System.IdentityModel.Tokens.Jwt;
 using gymapi.Data;
+using gymapi.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace gymapi.Controllers;
 
+/** 
+    Get, Post
+
+    /user
+
+    Get, Patch/Put/Delete?
+    /user/me
+    /user/{id:int}
+
+
+*/
 
 [ApiController]
 [Route("api/v1/[controller]")]
@@ -28,7 +40,7 @@ public class UserController : ControllerBase
         var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
         if (string.IsNullOrEmpty(userSub))
-            return new NotFoundObjectResult("User does not exist");
+            return new UnauthorizedObjectResult("JWT missing Sub claim");
 
         var user = await _userRepository.GetUser(userSub);
         if (user is not null)
@@ -36,4 +48,22 @@ public class UserController : ControllerBase
 
         return new RedirectResult("/createnewuser");
     }
+
+    [HttpPost("CreateMe")]
+    public async Task<IActionResult> CreateMe([FromBody] User requestBody)
+    {
+        var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        if (string.IsNullOrEmpty(userSub))
+            return new UnauthorizedObjectResult("JWT missing Sub claim");
+
+        var user = await _userRepository.GetUser(userSub);
+        if (user is not null)
+            return new BadRequestObjectResult("User already exists");
+
+        await _userRepository.AddUser(requestBody);
+
+        return new CreatedAtActionResult("Created user", nameof(CreateMe), new { Id = requestBody.Id }, requestBody);
+
+    }
+
 }

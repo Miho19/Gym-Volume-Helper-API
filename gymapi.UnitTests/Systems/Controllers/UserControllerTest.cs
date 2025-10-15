@@ -58,17 +58,74 @@ public class UserControllerTest
 
 
     [Fact]
-    public async Task GetMe_JWTMissingSubWithValidUser_Return404Failure()
+    public async Task GetMe_JWTMissingSubWithValidUser_Return401UnauthorizedStatusCode()
     {
         _userRepositoryMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(UserFixture.TestUser());
         _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestInvalidUserHttpContext() };
 
         var result = await _userControllerMock.GetMe();
         Assert.NotNull(result);
-        var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Equal(StatusCodes.Status404NotFound, notFoundObjectResult.StatusCode);
+        var unauthorizedObjectResult = Assert.IsType<UnauthorizedObjectResult>(result);
+        Assert.Equal(StatusCodes.Status401Unauthorized, unauthorizedObjectResult.StatusCode);
     }
 
+    [Fact]
+    public async Task CreateMe_OnSuccess_WithValidSubAndRequestUserBody_Returns201CreatedStatusCode()
+    {
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
+
+        var result = await _userControllerMock.CreateMe(UserFixture.TestUser());
+
+        Assert.NotNull(result);
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+        Assert.Equal(StatusCodes.Status201Created, createdAtActionResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateMe_OnSuccess_WithValidSubAndRequestUserBody_ReturnedCreatedUserHasSamePropertiesAsRequestBody()
+    {
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
+
+        var requestBody = UserFixture.TestUser();
+
+        var result = await _userControllerMock.CreateMe(requestBody);
+
+        Assert.NotNull(result);
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+        var createdUser = Assert.IsType<User>(createdAtActionResult.Value);
+
+        Assert.Equal(requestBody.Id, createdUser.Id);
+        Assert.Equal(requestBody.PictureSource, createdUser.PictureSource);
+        Assert.Equal(requestBody.Weight, createdUser.Weight);
+        Assert.Equal(requestBody.CurrentWorkoutId, createdUser.CurrentWorkoutId);
+    }
+    [Fact]
+    public async Task CreateMe_OnFailure_WithInvalidSubAndRequestUserBody_Returns404NotFound()
+    {
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestInvalidUserHttpContext() };
+
+        var requestBody = UserFixture.TestUser();
+
+        var result = await _userControllerMock.CreateMe(requestBody);
+
+        Assert.NotNull(result);
+        var unauthorizedObjectResult = Assert.IsType<UnauthorizedObjectResult>(result);
+        Assert.Equal(StatusCodes.Status401Unauthorized, unauthorizedObjectResult.StatusCode);
+    }
+    [Fact]
+    public async Task CreateMe_OnFailure_WithValidSubAndRequestUserBodyWhenUserAlreadyExists_Returns400BadRequest()
+    {
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
+        _userRepositoryMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(UserFixture.TestUser());
+
+        var requestBody = UserFixture.TestUser();
+
+        var result = await _userControllerMock.CreateMe(requestBody);
+
+        Assert.NotNull(result);
+        var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestObjectResult.StatusCode);
+    }
 
 
 }

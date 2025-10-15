@@ -10,7 +10,7 @@ public static class UserFixture
     {
         return new User()
         {
-            Id = "123456",
+            Id = "TestuserSub",
             PictureSource = "https://fakeImageUrl.com",
             CurrentWorkoutId = "0",
             Weight = 0,
