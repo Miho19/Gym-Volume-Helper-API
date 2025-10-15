@@ -1,5 +1,6 @@
 
 using System.IdentityModel.Tokens.Jwt;
+using gymapi.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +15,11 @@ namespace gymapi.Controllers;
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;
-    public UserController(ILogger<UserController> logger)
+    private readonly IUserRepository _userRepository;
+    public UserController(ILogger<UserController> logger, IUserRepository userRepository)
     {
         _logger = logger;
+        _userRepository = userRepository;
     }
 
     [HttpGet("GetMe")]
@@ -27,8 +30,10 @@ public class UserController : ControllerBase
         if (string.IsNullOrEmpty(userSub))
             return NotFound("User does not exist");
 
+        var user = await _userRepository.GetUser(userSub);
+        if (user is not null)
+            return Ok(user);
 
-
-        return Ok($"{userSub}");
+        return StatusCode(500, "An unexpected server error occurred");
     }
 }

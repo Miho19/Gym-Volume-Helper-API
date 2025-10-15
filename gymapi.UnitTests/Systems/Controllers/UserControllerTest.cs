@@ -2,6 +2,8 @@
 namespace gymapi.UnitTests.Systems.Controllers;
 
 using gymapi.Controllers;
+using gymapi.Data;
+using gymapi.Data.Repository.User;
 using gymapi.UnitTests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +16,16 @@ public class UserControllerTest
 {
 
     private readonly UserController _userControllerMock;
+    private readonly Mock<gymapi.Data.IUserRepository> _userRepositoryMock;
     private readonly ITestOutputHelper _logger;
 
     public UserControllerTest(ITestOutputHelper logger)
     {
         _logger = logger;
         var loggerMock = new Mock<ILogger<UserController>>();
-        _userControllerMock = new UserController(loggerMock.Object);
+        var userRepositoryMock = new Mock<IUserRepository>();
+        _userRepositoryMock = userRepositoryMock;
+        _userControllerMock = new UserController(loggerMock.Object, userRepositoryMock.Object);
     }
 
     [Fact]
