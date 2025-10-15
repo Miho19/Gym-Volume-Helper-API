@@ -8,6 +8,7 @@ using gymapi.Models;
 using gymapi.UnitTests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -155,8 +156,19 @@ public class UserControllerTest
         Assert.NotNull(result);
         var okResultObject = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(StatusCodes.Status200OK, okResultObject.StatusCode);
+    }
 
+    [Fact]
+    public async Task UpdateMe_OnFailure_Returns403ForbiddenStatusCode_WhenRequestBodyDoesNotMatchJWTSub()
+    {
+        _userControllerMock.ControllerContext = new ControllerContext() { HttpContext = UserFixture.TestValidUserHttpContext() };
+        var requestBody = UserFixture.TestUser();
+        requestBody.Id = "Random ID";
 
+        var result = await _userControllerMock.UpdateMe(requestBody);
+
+        Assert.NotNull(result);
+        var forbidResult = Assert.IsAssignableFrom<ForbidResult>(result);
     }
 
 }

@@ -4,6 +4,7 @@ using gymapi.Data;
 using gymapi.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -69,6 +70,9 @@ public class UserController : ControllerBase
         var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (string.IsNullOrEmpty(userSub))
             return new UnauthorizedObjectResult("JWT missing Sub claim");
+
+        if (requestBody.Id != userSub)
+            return Forbid();
 
         var result = await _userRepository.UpdateUser(requestBody);
         if (result is null)
