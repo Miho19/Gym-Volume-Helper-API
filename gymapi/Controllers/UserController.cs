@@ -32,8 +32,7 @@ public class UserController : ControllerBase
         _userRepository = userRepository;
     }
 
-    [HttpGet("GetMe")]
-    [Route("/me")]
+    [HttpGet("me", Name = "GetMe")]
     public async Task<IActionResult> GetMe()
     {
         var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
@@ -48,7 +47,7 @@ public class UserController : ControllerBase
         return new RedirectResult("/createnewuser");
     }
 
-    [HttpPost("CreateMe")]
+    [HttpPost("me", Name = "CreateMe")]
     public async Task<IActionResult> CreateMe([FromBody] User requestBody)
     {
         var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
@@ -64,7 +63,7 @@ public class UserController : ControllerBase
         return new CreatedAtActionResult("Created user", nameof(CreateMe), new { Id = requestBody.Id }, requestBody);
     }
 
-    [HttpPut]
+    [HttpPut("me", Name = "UpdateMe")]
     public async Task<IActionResult> UpdateMe([FromBody] User requestBody)
     {
         var userSub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
